@@ -33,7 +33,7 @@ export default function Searchbar({ onSubmitProp }) {
                 <input
                     className="SearchForm-input"
                     type="text"
-                    autoComplete="off"
+                    autoComplete="on"
                     placeholder="Search images and photos"
                     name="pictureName"
                     value={pictureName}

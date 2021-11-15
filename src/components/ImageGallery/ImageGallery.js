@@ -5,6 +5,9 @@ import fetchImages from '../../services/imageApi';
 import Spinner from '../Loader/Loader'
 import LoadMoreBtn from '../Button'
 import Modal from '../Modal'
+const shortid = require('shortid');
+
+console.log(shortid.generate());
 
 
 export default function ImageGallery({ pictureName }) {
@@ -28,7 +31,7 @@ export default function ImageGallery({ pictureName }) {
         setPage(1);
         fetchImages(pictureName, baseApi, myKey, page)
             .then(pictures => {
-                // console.log(pictures);
+                console.log(pictures);
                 if (pictures.length === 0) {
                     setStatus('rejected');;
                 }
@@ -63,15 +66,17 @@ export default function ImageGallery({ pictureName }) {
                 setError(error);
                 setStatus('rejected')
             })
-    }, [baseApi, setPictures, myKey, page, pictureName, pictures]);
+    }, [baseApi, myKey, page, pictureName, pictures, setPictures]);
 
 
 
     const onLoadMoreBtn = () => {
-        setPage(page => page + 1)
-    }
-    const toggleModal = () => {
+        setPage((prevPage) => prevPage + 10);
 
+    }
+
+    console.log(page)
+    const toggleModal = () => {
         setShowModal(!showModal)
 
     };
@@ -100,7 +105,7 @@ export default function ImageGallery({ pictureName }) {
                 <ul className="ImageGallery">
                     {pictures.map((picture) => (
                         <ImageGalleryItem
-                            key={picture.id}
+                            key={shortid.generate()}
                             webformatURL={picture.webformatURL}
                             largeImageURL={picture.largeImageURL}
                             onOpen={takeModalPicture}
@@ -123,32 +128,6 @@ export default function ImageGallery({ pictureName }) {
 ImageGallery.propTypes = {
     inputValue: PropTypes.string,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
