@@ -1,5 +1,7 @@
-function fetchImages(pictureName, baseApi, myKey, page) {
-    return fetch(`${baseApi}?q=${pictureName}&page=${page}&key=${myKey}&image_type=photo&orientation=horizontal&per_page=12`)
+
+
+function fetchImages(pictureName, page) {
+    return fetch(`https://pixabay.com/api/?q=${pictureName}&page=${page}&key=23171615-fcdc729843fe7af43a640cf8d&image_type=photo&orientation=horizontal&per_page=12`)
         .then(response =>
             response.json())
         .then(data => {
@@ -7,3 +9,5 @@ function fetchImages(pictureName, baseApi, myKey, page) {
         })
 }
 export default fetchImages
+
+

@@ -1,105 +1,83 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import ImageGalleryItem from '../ImageGalleryItem';
-import fetchImages from '../../services/imageApi';
-import Spinner from '../Loader/Loader'
-import LoadMoreBtn from '../Button'
-import Modal from '../Modal'
-const shortid = require('shortid');
-
+import ImageGalleryItem from "../ImageGalleryItem";
+import fetchImages from "../../services/imageApi";
+import Spinner from "../Loader/Loader";
+import LoadMoreBtn from "../Button";
+import Modal from "../Modal";
+const shortid = require("shortid");
 console.log(shortid.generate());
-
-
 export default function ImageGallery({ pictureName }) {
-
     const [error, setError] = useState(null);
-    const [status, setStatus] = useState('idle');
+    const [status, setStatus] = useState("idle");
     const [pictures, setPictures] = useState([]);
-    const [baseApi] = useState("https://pixabay.com/api/");
-    const [myKey] = useState('23171615-fcdc729843fe7af43a640cf8d');
     const [page, setPage] = useState(1);
-    const [largeUrl, setLargeUrl] = useState('');
+    const [largeUrl, setLargeUrl] = useState("");
     const [showModal, setShowModal] = useState(false);
 
-
+    useEffect(() => {
+        // if change searchQuery -> setPage 1
+        setPage(1);
+    }, [pictureName]);
     useEffect(() => {
         if (!pictureName) {
             return;
         }
-        setStatus('pending');
-        setPictures([]);
-        setPage(1);
-        fetchImages(pictureName, baseApi, myKey, page)
-            .then(pictures => {
-                console.log(pictures);
-                if (pictures.length === 0) {
-                    setStatus('rejected');;
+        setStatus("pending");
+        fetchImages(pictureName, page)
+            .then((pictures) => {
+                if (page === 1) {
+                    setPictures(pictures);
+                } else {
+                    setPictures((prev) => [...prev, ...pictures]);
                 }
-                setPictures(pictures);
-            })
-            .then(setStatus('resolved'))
-
-            .catch(error => {
-                setError(error);
-                setStatus('rejected')
-            })
-    }, [baseApi, setPictures, myKey, page, pictureName]);
-
-    useEffect(() => {
-        if (page === 1) {
-            return;
-        }
-        setStatus('pending');
-        fetchImages(pictureName, baseApi, myKey, page)
-            .then(pictures => {
                 if (pictures.length === 0) {
-                    return setStatus('rejected')
+                    setStatus("rejected");
+                    return;
                 }
-                setPictures(pictures);
+                setStatus("resolved");
+                scrollToLoadBtn();
             })
-            .then(setStatus('resolved'))
-            .then(() => window.scrollTo({
-                top: document.documentElement.scrollHeight,
-                behavior: 'smooth',
-            }))
-            .catch(error => {
+            .catch((error) => {
                 setError(error);
-                setStatus('rejected')
-            })
-    }, [baseApi, myKey, page, pictureName, pictures, setPictures]);
+            });
+    }, [page, pictureName]);
 
+    const scrollToLoadBtn = () => {
+        return window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth",
+        });
+    };
 
 
     const onLoadMoreBtn = () => {
-        setPage((prevPage) => prevPage + 10);
+        setPage((prevPage) => prevPage + 1);
+    };
 
-    }
-
-    console.log(page)
     const toggleModal = () => {
-        setShowModal(!showModal)
-
+        setShowModal(!showModal);
     };
     const takeModalPicture = (url) => {
-        setLargeUrl(url)
-        setShowModal(true)
-
+        setLargeUrl(url);
+        setShowModal(true);
     };
-
-    if (status === 'idle') {
-        return <h1 className="title"> Enter what are you looking for.</h1>
+    if (status === "idle") {
+        return <h1 className="title"> Enter what are you looking for.</h1>;
     }
-    if (status === 'pending') {
-        return <Spinner />
-
+    if (status === "pending") {
+        return <Spinner />;
     }
-    if (status === 'rejected') {
-        return <h1 className="title">
-            By searching "{pictureName}" nothing found, sorry.<br />
-            Try enter something else
-        </h1>
+    if (status === "rejected") {
+        return (
+            <h1 className="title">
+                By searching "{pictureName}" nothing found, sorry.
+                <br />
+                Try enter something else
+            </h1>
+        );
     }
-    if (status === 'resolved') {
+    if (status === "resolved") {
         return (
             <div>
                 <ul className="ImageGallery">
@@ -116,18 +94,153 @@ export default function ImageGallery({ pictureName }) {
                     <Modal onClose={toggleModal}>
                         <img src={largeUrl} alt="modal-img" />
                     </Modal>
-                )
-                }
+                )}
                 <LoadMoreBtn onLoadMoreBtn={onLoadMoreBtn} />
-            </div >
-        )
+            </div>
+        );
     }
 }
-
-
 ImageGallery.propTypes = {
     inputValue: PropTypes.string,
 };
+
+
+
+
+
+
+
+
+// import { useState, useEffect } from 'react';
+// import PropTypes from "prop-types";
+// import ImageGalleryItem from '../ImageGalleryItem';
+// import fetchImages from '../../services/imageApi';
+// import Spinner from '../Loader/Loader'
+// import LoadMoreBtn from '../Button'
+// import Modal from '../Modal'
+// const shortid = require('shortid');
+
+// console.log(shortid.generate());
+
+
+// export default function ImageGallery({ pictureName }) {
+
+//     const [error, setError] = useState(null);
+//     const [status, setStatus] = useState('idle');
+//     const [pictures, setPictures] = useState([]);
+//     const [baseApi] = useState("https://pixabay.com/api/");
+//     const [myKey] = useState('23171615-fcdc729843fe7af43a640cf8d');
+//     const [page, setPage] = useState(1);
+//     const [largeUrl, setLargeUrl] = useState('');
+//     const [showModal, setShowModal] = useState(false);
+
+
+//     useEffect(() => {
+//         if (!pictureName) {
+//             return;
+//         }
+//         setStatus('pending');
+//         setPictures([]);
+//         setPage(1);
+//         fetchImages(pictureName, baseApi, myKey, page)
+//             .then(pictures => {
+//                 console.log(pictures);
+//                 if (pictures.length === 0) {
+//                     setStatus('rejected');;
+//                 }
+//                 setPictures(pictures);
+//             })
+//             .then(setStatus('resolved'))
+
+//             .catch(error => {
+//                 setError(error);
+//                 setStatus('rejected')
+//             })
+//     }, [baseApi, setPictures, myKey, page, pictureName]);
+
+//     useEffect(() => {
+//         if (page === 1) {
+//             return;
+//         }
+//         setStatus('pending');
+//         fetchImages(pictureName, baseApi, myKey, page)
+//             .then(pictures => {
+//                 if (pictures.length === 0) {
+//                     return setStatus('rejected')
+//                 }
+//                 setPictures(pictures);
+//             })
+//             .then(setStatus('resolved'))
+//             .then(() => window.scrollTo({
+//                 top: document.documentElement.scrollHeight,
+//                 behavior: 'smooth',
+//             }))
+//             .catch(error => {
+//                 setError(error);
+//                 setStatus('rejected')
+//             })
+//     }, [baseApi, myKey, page, pictureName, pictures, setPictures]);
+
+
+
+//     const onLoadMoreBtn = () => {
+//         setPage((prevPage) => prevPage + 10);
+
+//     }
+
+//     console.log(page)
+//     const toggleModal = () => {
+//         setShowModal(!showModal)
+
+//     };
+//     const takeModalPicture = (url) => {
+//         setLargeUrl(url)
+//         setShowModal(true)
+
+//     };
+
+//     if (status === 'idle') {
+//         return <h1 className="title"> Enter what are you looking for.</h1>
+//     }
+//     if (status === 'pending') {
+//         return <Spinner />
+
+//     }
+//     if (status === 'rejected') {
+//         return <h1 className="title">
+//             By searching "{pictureName}" nothing found, sorry.<br />
+//             Try enter something else
+//         </h1>
+//     }
+//     if (status === 'resolved') {
+//         return (
+//             <div>
+//                 <ul className="ImageGallery">
+//                     {pictures.map((picture) => (
+//                         <ImageGalleryItem
+//                             key={shortid.generate()}
+//                             webformatURL={picture.webformatURL}
+//                             largeImageURL={picture.largeImageURL}
+//                             onOpen={takeModalPicture}
+//                         />
+//                     ))}
+//                 </ul>
+//                 {showModal && (
+//                     <Modal onClose={toggleModal}>
+//                         <img src={largeUrl} alt="modal-img" />
+//                     </Modal>
+//                 )
+//                 }
+//                 <LoadMoreBtn onLoadMoreBtn={onLoadMoreBtn} />
+//             </div >
+//         )
+//     }
+// }
+
+
+// ImageGallery.propTypes = {
+//     inputValue: PropTypes.string,
+// };
 
 
 
